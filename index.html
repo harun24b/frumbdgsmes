@@ -1,1 +1,301 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Egg Farm Invest</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    :root { --bg-color: linear-gradient(160deg, #0b0c17, #1c1f2a); --card-bg-color: rgba(255,255,255,0.05); --primary-text-color: #ffffff; --accent-color: #facc15; --timer-color: #38bdf8; --font-family: 'Poppins', sans-serif; --glow-color: #facc15; --danger-color: #ef4444; }
+    body { margin: 0; padding: 0; font-family: var(--font-family); background: var(--bg-color); color: var(--primary-text-color); }
+    .container { padding: 10px; max-width: 500px; margin: 0 auto; padding-bottom: 100px; }
+    .hide { display: none; }
+    .auth-container { background: var(--card-bg-color); border-radius: 25px; padding: 30px; margin-top: 80px; text-align: center; box-shadow: 0 0 25px rgba(250,204,21,0.6); backdrop-filter: blur(10px); }
+    .auth-container h1 { color: var(--accent-color); text-shadow: 0 0 10px var(--glow-color); }
+    .auth-tabs { display: flex; justify-content: center; margin-bottom: 20px; }
+    .tab { flex: 1; padding: 12px; cursor: pointer; color: #888; border-bottom: 2px solid transparent; font-weight: 600; }
+    .tab.active { color: var(--accent-color); border-color: var(--accent-color); }
+    input, select { width: 90%; padding: 14px; margin: 8px 0; border-radius: 12px; border: none; background: rgba(255,255,255,0.1); color: white; font-size: 16px; font-family: var(--font-family); }
+    button, .button { width: 90%; padding: 12px; margin: 8px auto; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; background-color: var(--accent-color); color: #000; box-shadow: 0 0 15px var(--glow-color); text-align: center; text-decoration: none; display: block; }
+    button:disabled { background-color: rgba(128,128,128,0.2); color: #888; cursor: not-allowed; box-shadow: none; }
+    #statusMsg { font-size: 14px; margin-top: 10px; color: var(--timer-color); }
+    .game-header { text-align: center; margin-top: 20px; padding: 15px; background: var(--card-bg-color); border-radius: 20px; backdrop-filter: blur(8px); margin-bottom: 20px; }
+    .game-header .stats { display: flex; justify-content: space-around; margin-top: 10px; }
+    .game-header .stat span { color: var(--accent-color); font-weight: bold; }
+    .card { background: var(--card-bg-color); border-radius: 20px; padding: 18px; margin-bottom: 15px; text-align: center; backdrop-filter: blur(8px); }
+    .item-title { font-size: 20px; font-weight: bold; }
+    .item-icon { font-size: 50px; }
+    .action-button { background-color: rgba(250,204,21,0.2); color: var(--accent-color); }
+    .action-button:disabled { background-color: rgba(128,128,128,0.2); color: #888; cursor: not-allowed; }
+    .info-text { margin: 5px 0; }
+    .info-text span { color: var(--timer-color); font-weight: bold; }
+    .nav-bar { display: flex; justify-content: space-around; padding: 12px 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); position: fixed; bottom: 0; width: 100%; max-width: 500px; left: 50%; transform: translateX(-50%); z-index: 100; }
+    .nav-btn { width: 65px; height: 65px; border-radius: 50%; border: none; font-size: 12px; background-color: rgba(255,255,255,0.05); color: #ccc; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .nav-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
+    .logout-btn { background: var(--danger-color); color: white; margin-top: 15px; }
+    #nurseryList p { margin: 5px 0; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: #1c1f2a; padding: 25px; border-radius: 15px; text-align: center; width: 80%; max-width: 350px; box-shadow: 0 0 20px rgba(250, 204, 21, 0.5); border: 1px solid var(--accent-color); }
+    .modal-content p { margin: 0 0 20px 0; color: var(--primary-text-color); font-size: 16px; }
+    .modal-content button { width: 100px; padding: 10px; margin: 0 auto; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; background-color: var(--accent-color); color: #000; display: block; }
+</style>
+
+<!-- আপনার SDK এখানে যোগ করা হয়েছে -->
+<script src='//libtl.com/sdk.js' data-zone='10140813' data-sdk='show_10140813'></script>
+
+</head>
+<body>
+
+<!-- Login/Signup Page -->
+<div class="container" id="loginPage">
+  <div class="auth-container">
+    <h1>Egg Farm Invest</h1>
+    <div class="auth-tabs">
+      <div id="loginTab" class="tab active" onclick="switchTab('login')">লগইন</div>
+      <div id="signupTab" class="tab" onclick="switchTab('signup')">সাইন আপ</div>
+    </div>
+    <div id="loginForm">
+        <input type="email" id="loginEmail" placeholder="ইমেইল">
+        <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড">
+        <button onclick="handleLogin()">লগইন করুন</button>
+    </div>
+    <div id="signupForm" class="hide">
+        <input type="email" id="signupEmail" placeholder="ইমেইল">
+        <input type="password" id="signupPassword" placeholder="পাসওয়ার্ড">
+        <input type="password" id="signupConfirmPassword" placeholder="পাসওয়ার্ড নিশ্চিত করুন">
+        <button onclick="handleSignup()">সাইন আপ করুন</button>
+    </div>
+    <p id="statusMsg"></p>
+  </div>
+</div>
+
+<!-- Game Page -->
+<div class="container hide" id="gamePage">
+    <div class="game-header">
+        <h2 id="welcomeMsg"></h2>
+        <div class="stats">
+            <div class="stat">💰 টাকা: <span id="moneyDisplay">0</span></div>
+            <div class="stat">🥚 ডিম: <span id="eggDisplay">0</span></div>
+        </div>
+    </div>
+    <!-- Home View -->
+    <div id="homeView">
+        <a id="telegramLink" href="#" target="_blank" class="button hide" style="background-color: #2AABEE; color: white; margin-bottom: 15px;">টেলিগ্রাম চ্যানেলে যোগ দিন</a>
+        
+        <div id="adRewardView" class="card">
+            <div class="item-icon">📺</div>
+            <div class="item-title">বিজ্ঞাপন দেখুন</div>
+            <p class="info-text">বিজ্ঞাপন দেখে টাকা আয় করুন!</p>
+            <button id="watchAdBtn" onclick="watchAdForReward()">বিজ্ঞাপন দেখুন</button>
+            <p class="info-text"><span id="adTimer"></span></p>
+        </div>
+
+        <div id="nurseryView" class="card">
+            <div class="item-icon">🐣</div>
+            <div class="item-title">ইনকিউবেটর</div>
+            <div id="nurseryList"></div>
+        </div>
+        <div class="card">
+            <div class="item-icon">🦢</div>
+            <div class="item-title">রাজহাঁস</div>
+            <p class="info-text">আপনার কাছে আছে: <span id="swanCount">0</span> টি</p>
+            <p class="info-text">খাবার আছে: <span id="swanFoodCount">0</span> প্যাকেট</p>
+            <button class="action-button" onclick="collectEggs('swan')" id="collectSwanEggBtn" disabled>ডিম সংগ্রহ করুন</button>
+            <p class="info-text">পরবর্তী ডিম: <span id="swanTimer">--:--</span></p>
+        </div>
+        <div class="card">
+            <div class="item-icon">🦜</div>
+            <div class="item-title">টিয়া পাখি</div>
+            <p class="info-text">আপনার কাছে আছে: <span id="parrotCount">0</span> টি</p>
+            <p class="info-text">খাবার আছে: <span id="parrotFoodCount">0</span> প্যাকেট</p>
+            <button class="action-button" onclick="collectEggs('parrot')" id="collectParrotEggBtn" disabled>ডিম সংগ্রহ করুন</button>
+            <p class="info-text">পরবর্তী ডিম: <span id="parrotTimer">--:--</span></p>
+        </div>
+         <button class="logout-btn" onclick="logout()">লগ আউট</button>
+    </div>
+    <!-- Shop View -->
+    <div id="shopView" class="hide">
+        <div class="card">
+            <div class="item-icon">🦢</div>
+            <div class="item-title">রাজহাঁসের বাচ্চা</div>
+            <p class="info-text">দাম: <span id="babySwanPrice">0</span> টাকা</p>
+            <button class="button" onclick="buyItem('babySwan')">কিনুন</button>
+        </div>
+         <div class="card">
+            <div class="item-icon">🦜</div>
+            <div class="item-title">টিয়ার বাচ্চা</div>
+            <p class="info-text">দাম: <span id="babyParrotPrice">0</span> টাকা</p>
+            <button class="button" onclick="buyItem('babyParrot')">কিনুন</button>
+        </div>
+        <div class="card">
+            <div class="item-icon">🍲</div>
+            <div class="item-title">রাজহাঁসের খাবার</div>
+            <p class="info-text">দাম: <span id="swanFoodPrice">0</span> টাকা</p>
+            <button class="button" onclick="buyItem('swanFood')">কিনুন</button>
+        </div>
+         <div class="card">
+            <div class="item-icon">🥜</div>
+            <div class="item-title">টিয়ার খাবার</div>
+            <p class="info-text">দাম: <span id="parrotFoodPrice">0</span> টাকা</p>
+            <button class="button" onclick="buyItem('parrotFood')">কিনুন</button>
+        </div>
+    </div>
+    <!-- Market View -->
+    <div id="marketView" class="hide">
+        <div class="card">
+            <div class="item-icon">🥚</div>
+            <div class="item-title">ডিমের বাজার</div>
+            <p class="info-text">রাজহাঁসের ডিম আছে: <span id="swanEggCount">0</span> টি</p>
+            <p class="info-text">টিয়ার ডিম আছে: <span id="parrotEggCount">0</span> টি</p>
+            <button class="button" onclick="sellAllEggs()">সব ডিম বিক্রি করুন</button>
+        </div>
+    </div>
+    <!-- Cashout View -->
+    <div id="cashoutView" class="hide">
+        <div class="card">
+            <div class="item-icon">💸</div>
+            <div class="item-title">টাকা উত্তোলন</div>
+            <p class="info-text">আপনার বর্তমান ব্যালেন্স: <span id="cashoutBalance">0</span> টাকা</p>
+            <select id="paymentMethod">
+                <option value="bKash">বিকাশ</option>
+                <option value="Nagad">নগদ</option>
+                <option value="Rocket">রকেট</option>
+            </select>
+            <input type="text" id="accountDetails" placeholder="আপনার অ্যাকাউন্ট নম্বর দিন">
+            <input type="number" id="cashoutAmount" placeholder="টাকার পরিমাণ দিন">
+            <button class="button" onclick="requestCashOut()">রিকুয়েস্ট পাঠান</button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <button id="navHome" class="nav-btn active" onclick="showGameView('home')">🏠<br>ফার্ম</button>
+        <button id="navShop" class="nav-btn" onclick="showGameView('shop')">🛒<br>শপ</button>
+        <button id="navMarket" class="nav-btn" onclick="showGameView('market')">📈<br>মার্কেট</button>
+        <button id="navCashout" class="nav-btn" onclick="showGameView('cashout')">💸<br>ক্যাশ আউট</button>
+    </div>
+</div>
+
+<!-- Custom Alert Modal -->
+<div id="customAlertModal" class="modal-overlay">
+    <div class="modal-content">
+        <p id="customAlertMessage"></p>
+        <button onclick="closeCustomAlert()">ঠিক আছে</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCs89Peo98U8n8VpYoYvELZufYRntYwJ7Y",
+  authDomain: "frumgames.firebaseapp.com",
+  databaseURL: "https://frumgames-default-rtdb.firebaseio.com",
+  projectId: "frumgames",
+  storageBucket: "frumgames.firebasestorage.app",
+  messagingSenderId: "676354256457",
+  appId: "1:676354256457:web:12bab00d1c76a5eee81998"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentUserData = null;
+let gameSettings = {};
+let gameInterval;
+const ADMIN_EMAIL = "Harun123@gmail.com";
+
+// ### সাধারণ ফাংশন (কোনো পরিবর্তন নেই) ###
+function customAlert(message) { document.getElementById('customAlertMessage').textContent = message; document.getElementById('customAlertModal').style.display = 'flex'; }
+function closeCustomAlert() { document.getElementById('customAlertModal').style.display = 'none'; }
+function switchTab(tabName) { document.getElementById('loginTab').classList.toggle('active', tabName === 'login'); document.getElementById('signupTab').classList.toggle('active', tabName === 'signup'); document.getElementById('loginForm').classList.toggle('hide', tabName !== 'login'); document.getElementById('signupForm').classList.toggle('hide', tabName !== 'signup'); }
+auth.onAuthStateChanged(user => { if (user && user.email !== ADMIN_EMAIL) { loadGameDataForUser(user.uid); } else { showLoginPage(); if(gameInterval) clearInterval(gameInterval); } });
+function handleLogin() { const email = document.getElementById('loginEmail').value; const password = document.getElementById('loginPassword').value; const msg = document.getElementById('statusMsg'); msg.textContent = "লগইন করা হচ্ছে..."; auth.signInWithEmailAndPassword(email, password).catch(error => msg.textContent = "ভুল ইমেইল বা পাসওয়ার্ড।"); }
+function handleSignup() { const email = document.getElementById('signupEmail').value; const password = document.getElementById('signupPassword').value; const confirmPassword = document.getElementById('signupConfirmPassword').value; const msg = document.getElementById('statusMsg'); if (password !== confirmPassword) { msg.textContent = "পাসওয়ার্ড মেলেনি।"; return; } msg.textContent = "অ্যাকাউন্ট তৈরি করা হচ্ছে..."; auth.createUserWithEmailAndPassword(email, password).then(cred => initializeNewUserData(cred.user.uid, email)).catch(error => msg.textContent = error.message); }
+function initializeNewUserData(userId, email) { db.ref('users/' + userId).set({ email: email, money: 100, eggs: { swan: 0, parrot: 0 }, animals: { swan: 0, parrot: 0 }, food: { swan: 0, parrot: 0 }, timers: { swanEgg: Date.now(), parrotEgg: Date.now(), lastAdWatch: 0 }, nursery: {} }); }
+function logout() { auth.signOut(); }
+function showLoginPage() { document.getElementById('loginPage').classList.remove('hide'); document.getElementById('gamePage').classList.add('hide'); }
+function loadGameDataForUser(userId) { db.ref('gameSettings').on('value', snapshot => { if(snapshot.exists()) gameSettings = snapshot.val(); db.ref('users/' + userId).on('value', (snapshot) => { currentUserData = snapshot.val(); if(currentUserData){ document.getElementById('gamePage').classList.contains('hide') ? showGamePage() : updateUI(); } }); }); }
+function showGamePage() { document.getElementById('loginPage').classList.add('hide'); document.getElementById('gamePage').classList.remove('hide'); updateUI(); if(gameInterval) clearInterval(gameInterval); gameInterval = setInterval(() => { eggLoop(); checkNursery(); updateAdCooldownTimer(); }, 1000); }
+function updateUI() { if (!currentUserData) return; const d = currentUserData; const s = gameSettings || {}; document.getElementById('welcomeMsg').textContent = `স্বাগতম, ${d.email.split('@')[0]}`; document.getElementById('moneyDisplay').textContent = d.money; document.getElementById('eggDisplay').textContent = (d.eggs?.swan || 0) + (d.eggs?.parrot || 0); document.getElementById('cashoutBalance').textContent = d.money; const tgLink = document.getElementById('telegramLink'); if(s.telegramUrl && s.telegramUrl.length > 5) { tgLink.href = s.telegramUrl; tgLink.classList.remove('hide'); } else { tgLink.classList.add('hide'); } document.getElementById('swanCount').textContent = d.animals?.swan || 0; document.getElementById('swanFoodCount').textContent = d.food?.swan || 0; document.getElementById('parrotCount').textContent = d.animals?.parrot || 0; document.getElementById('parrotFoodCount').textContent = d.food?.parrot || 0; const shopSettings = s.shop || {}; document.getElementById('babySwanPrice').textContent = shopSettings.babySwan?.price || 0; document.getElementById('babyParrotPrice').textContent = shopSettings.babyParrot?.price || 0; document.getElementById('swanFoodPrice').textContent = shopSettings.swanFood?.price || 0; document.getElementById('parrotFoodPrice').textContent = shopSettings.parrotFood?.price || 0; document.getElementById('swanEggCount').textContent = d.eggs?.swan || 0; document.getElementById('parrotEggCount').textContent = d.eggs?.parrot || 0; const nurseryListDiv = document.getElementById('nurseryList'); nurseryListDiv.innerHTML = ''; if (d.nursery && Object.keys(d.nursery).length > 0) { Object.values(d.nursery).forEach(baby => { const timeLeft = Math.max(0, baby.readyTime - Date.now()); nurseryListDiv.innerHTML += `<p class="info-text">একটি ${baby.type === 'swan' ? 'রাজহাঁস' : 'টিয়া'} বড় হচ্ছে... <span>${new Date(timeLeft).toISOString().substr(14, 5)}</span></p>`; }); } else { nurseryListDiv.innerHTML = '<p class="info-text">এখানে কোনো বাচ্চা বড় হচ্ছে না।</p>'; } }
+function eggLoop() { if (!currentUserData) return; ['swan', 'parrot'].forEach(type => { const count = currentUserData.animals?.[type] || 0; const food = currentUserData.food?.[type] || 0; const animalSettings = gameSettings.animals?.[type] || {}; const eggTime = (animalSettings.boostedEggTime || 3600) * 1000; const timeLeft = Math.max(0, (currentUserData.timers?.[type + 'Egg'] || 0) + eggTime - Date.now()); const canCollect = count > 0 && food >= count && timeLeft <= 0; document.getElementById(`collect${type.charAt(0).toUpperCase() + type.slice(1)}EggBtn`).disabled = !canCollect; document.getElementById(`${type}Timer`).textContent = canCollect ? "সংগ্রহ করুন!" : new Date(timeLeft).toISOString().substr(14, 5); }); }
+function checkNursery() { if (!currentUserData?.nursery) return; const now = Date.now(); const updates = {}; let grownAnimalsAlerts = []; Object.entries(currentUserData.nursery).forEach(([key, baby]) => { if (now >= baby.readyTime) { updates[`/users/${auth.currentUser.uid}/animals/${baby.type}`] = (currentUserData.animals?.[baby.type] || 0) + 1; updates[`/users/${auth.currentUser.uid}/nursery/${key}`] = null; grownAnimalsAlerts.push(`আপনার একটি ${baby.type === 'swan' ? 'রাজহাঁসের' : 'টিয়ার'} বাচ্চা বড় হয়ে গেছে!`); } }); if (Object.keys(updates).length > 0) { db.ref().update(updates).then(() => { grownAnimalsAlerts.forEach(customAlert); }); } }
+function buyItem(itemName) { const item = gameSettings.shop?.[itemName]; if(!item) { customAlert("দোকানে এই জিনিসটি এখন নেই।"); return; } if (currentUserData.money < item.price) { customAlert("আপনার যথেষ্ট টাকা নেই!"); return; } const userRef = db.ref('users/' + auth.currentUser.uid); const updates = {}; updates['/money'] = currentUserData.money - item.price; if (itemName.includes('Food')) { const type = itemName.replace('Food', ''); updates[`/food/${type}`] = (currentUserData.food?.[type] || 0) + 1; customAlert(`১ প্যাকেট ${type === 'swan' ? 'রাজহাঁসের' : 'টিয়ার'} খাবার কেনা হয়েছে!`); } else { const type = itemName.replace('baby', '').toLowerCase(); const growthTime = item.growthTime * 1000; const newBabyRef = userRef.child('nursery').push(); updates[`/nursery/${newBabyRef.key}`] = { type, readyTime: Date.now() + growthTime }; customAlert(`বাচ্চাটি ইনকিউবেটরে দেওয়া হয়েছে!`); } userRef.update(updates); }
+function collectEggs(animalType) { const count = currentUserData.animals?.[animalType] || 0; const food = currentUserData.food?.[animalType] || 0; if (count > 0 && food >= count) { const updates = { [`/food/${animalType}`]: food - count, [`/eggs/${animalType}`]: (currentUserData.eggs?.[animalType] || 0) + count, [`/timers/${animalType}Egg`]: Date.now() }; db.ref('users/' + auth.currentUser.uid).update(updates); customAlert(`${count} টি ডিম সংগ্রহ করা হয়েছে!`); } else { customAlert("ডিম সংগ্রহের জন্য যথেষ্ট খাবার নেই।"); } }
+function sellAllEggs() { const swanEggValue = gameSettings.animals?.swan?.eggValue || 0; const parrotEggValue = gameSettings.animals?.parrot?.eggValue || 0; const swanEarnings = (currentUserData.eggs?.swan || 0) * swanEggValue; const parrotEarnings = (currentUserData.eggs?.parrot || 0) * parrotEggValue; const totalEarnings = swanEarnings + parrotEarnings; if (totalEarnings > 0) { db.ref('users/' + auth.currentUser.uid).update({ '/money': currentUserData.money + totalEarnings, '/eggs/swan': 0, '/eggs/parrot': 0 }); customAlert(`${totalEarnings} টাকার ডিম বিক্রি করা হয়েছে!`); } else { customAlert("বিক্রি করার মতো কোনো ডিম নেই।"); } }
+function requestCashOut() { const amount = parseInt(document.getElementById('cashoutAmount').value); const paymentMethod = document.getElementById('paymentMethod').value; const accountDetails = document.getElementById('accountDetails').value; const userId = auth.currentUser.uid; if (!amount || amount <= 0) { customAlert("দয়া করে সঠিক পরিমাণ লিখুন।"); return; } if (amount > currentUserData.money) { customAlert("আপনার অ্যাকাউন্টে যথেষ্ট টাকা নেই।"); return; } if (!accountDetails) { customAlert("দয়া করে আপনার অ্যাকাউন্ট নম্বর দিন।"); return; } const newRequestKey = db.ref('cashoutRequests').push().key; const newBalance = currentUserData.money - amount; const updates = {}; updates[`/users/${userId}/money`] = newBalance; updates[`/cashoutRequests/${newRequestKey}`] = { userId: userId, userEmail: auth.currentUser.email, amount: amount, paymentMethod: paymentMethod, accountDetails: accountDetails, status: 'pending', timestamp: Date.now() }; db.ref().update(updates).then(() => { customAlert("আপনার টাকা উত্তোলনের অনুরোধটি গ্রহণ করা হয়েছে।"); document.getElementById('cashoutAmount').value = ''; document.getElementById('accountDetails').value = ''; showGameView('home'); }).catch(error => { customAlert("একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"); }); }
+function showGameView(viewName) { ['home', 'shop', 'market', 'cashout'].forEach(v => { document.getElementById(v + 'View').classList.add('hide'); document.getElementById('nav' + v.charAt(0).toUpperCase() + v.slice(1)).classList.remove('active'); }); document.getElementById(viewName + 'View').classList.remove('hide'); document.getElementById('nav' + viewName.charAt(0).toUpperCase() + viewName.slice(1)).classList.add('active'); }
+
+// ===========================================
+// ### বিজ্ঞাপন রিওয়ার্ডের সংশোধিত ফাংশন ###
+// ===========================================
+
+function updateAdCooldownTimer() {
+    if (!currentUserData) return;
+
+    // ডাটাবেস থেকে সেটিংস না পেলেও যেন কোড বন্ধ না হয়
+    const rewardsSettings = gameSettings.rewards || {};
+    const adBtn = document.getElementById('watchAdBtn');
+    const adTimerSpan = document.getElementById('adTimer');
+    
+    // ডিফল্ট মান হিসেবে ৩০০ সেকেন্ড (৫ মিনিট) ব্যবহার করা হয়েছে
+    const cooldown = (rewardsSettings.adCooldownSeconds || 300) * 1000;
+    const lastWatch = currentUserData.timers?.lastAdWatch || 0;
+    const nextAdTime = lastWatch + cooldown;
+    const timeLeft = Math.max(0, nextAdTime - Date.now());
+
+    if (timeLeft > 0) {
+        adBtn.disabled = true;
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        adTimerSpan.textContent = `পরবর্তী বিজ্ঞাপন: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    } else {
+        adBtn.disabled = false;
+        adTimerSpan.textContent = "এখন বিজ্ঞাপন দেখতে পারবেন!";
+    }
+}
+
+function watchAdForReward() {
+    // বিজ্ঞাপন SDK লোড হয়েছে কিনা তা পরীক্ষা করা হচ্ছে
+    if (typeof show_10140813 !== 'function') {
+        customAlert("বিজ্ঞাপন লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন অথবা আপনার অ্যাড-ব্লকার চেক করুন।");
+        console.error("Ad SDK function 'show_10140813' is not available.");
+        return;
+    }
+
+    const rewardsSettings = gameSettings.rewards || {};
+    const cooldown = (rewardsSettings.adCooldownSeconds || 300) * 1000;
+    const rewardAmount = rewardsSettings.adRewardAmount || 50; // ডিফল্ট পুরস্কার ৫০ টাকা
+    const lastWatch = currentUserData.timers?.lastAdWatch || 0;
+
+    if (Date.now() < lastWatch + cooldown) {
+        customAlert("দয়া করে পরবর্তী বিজ্ঞাপনের জন্য অপেক্ষা করুন।");
+        return;
+    }
+
+    // বিজ্ঞাপন দেখানো হচ্ছে
+    show_10140813('pop').then(() => {
+        // বিজ্ঞাপন সফলভাবে দেখলে
+        const userRef = db.ref('users/' + auth.currentUser.uid);
+        const updates = {
+            'money': currentUserData.money + rewardAmount,
+            'timers/lastAdWatch': Date.now()
+        };
+
+        userRef.update(updates).then(() => {
+            customAlert(`অভিনন্দন! আপনি ${rewardAmount} টাকা পেয়েছেন!`);
+        });
+
+    }).catch(e => {
+        // বিজ্ঞাপন দেখাতে সমস্যা হলে
+        customAlert("বিজ্ঞাপন দেখাতে একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।");
+        console.error("Ad SDK error:", e);
+    });
+}
+</script>
+</body>
+</html>
